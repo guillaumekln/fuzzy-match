@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <numeric>
+
 #include <fuzzy/suffix_array.hh>
 
 #include <fuzzy/tsl/hopscotch_map.h>
@@ -10,30 +13,24 @@ namespace fuzzy
   class PatternMatch {
   public:
     PatternMatch(size_t pattern_length)
-      : _matched_words(pattern_length, false)
-      , _num_matches(0)
+      : _matched_words(pattern_length, 0)
       , _longest_match(0)
     {
     }
 
     // Mark a range of words as matched in a sentence.
     void set_match(size_t index, size_t length = 1) {
-      for (size_t i = index; i < index + length; ++i) {
-        if (!_matched_words[index]) {
-          _matched_words[index] = true;
-          _num_matches++;
-        }
-      }
-
+      auto it = _matched_words.begin() + index;
+      std::fill(it, it + length, 1);
       _longest_match = std::max(_longest_match, length);
     }
 
     size_t num_non_matched_words() const {
-      return _matched_words.size() - _num_matches;
+      return _matched_words.size() - num_matched_words();
     }
 
     size_t num_matched_words() const {
-      return _num_matches;
+      return std::accumulate(_matched_words.begin(), _matched_words.end(), size_t(0));
     }
 
     // Longest consecutive match.
@@ -42,8 +39,7 @@ namespace fuzzy
     }
 
   private:
-    std::vector<bool> _matched_words;
-    size_t _num_matches;
+    std::vector<unsigned char> _matched_words;
     size_t _longest_match;
   };
 

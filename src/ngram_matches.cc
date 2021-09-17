@@ -4,9 +4,14 @@
 
 namespace fuzzy
 {
-  unsigned compute_min_exact_match(float fuzzy, unsigned p_length)
+  static inline unsigned compute_max_differences(float fuzzy, unsigned p_length)
   {
-    const auto differences = (unsigned)std::ceil(p_length * (1.f - fuzzy));
+    return std::ceil(p_length * (1.f - fuzzy));
+  }
+
+  static inline unsigned compute_min_exact_match(float fuzzy, unsigned p_length)
+  {
+    const auto differences = compute_max_differences(fuzzy, p_length);
     // we split (p_length - differences) in  (differences + 1) parts
     // the minimum value of the largest part size is obtained by dividing and taking ceil
     return std::ceil((p_length - differences) / (differences + 1.));
@@ -16,8 +21,7 @@ namespace fuzzy
                              float fuzzy, unsigned p_length,
                              unsigned min_seq_len,
                              const SuffixArray& suffixArray)
-    /* add a small epsilon to avoid rounding errors counting for an error */
-    : max_differences_with_pattern((unsigned)std::floor(p_length * (1.f - fuzzy) + 0.00005)),
+    : max_differences_with_pattern(compute_max_differences(fuzzy, p_length)),
       min_exact_match(compute_min_exact_match(fuzzy, p_length)),
       _p_length(p_length),
       _min_seq_len(min_seq_len),

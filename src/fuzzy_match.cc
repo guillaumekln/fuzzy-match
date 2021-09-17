@@ -561,7 +561,8 @@ namespace fuzzy
       }
 
       /* do not care checking sentences that do not have enough ngram matches for the fuzzy threshold */
-      if (p_length <= agendaItem.coverage + nGramMatches.max_differences_with_pattern)
+      const auto num_differences = p_length - agendaItem.coverage;
+      if (num_differences <= nGramMatches.max_differences_with_pattern)
       {
         Costs costs;
         costs.diff_word = 100. / std::max(s_length, p_length);

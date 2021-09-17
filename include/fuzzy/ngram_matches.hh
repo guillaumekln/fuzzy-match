@@ -15,7 +15,7 @@ namespace fuzzy
                  unsigned min_seq_len,
                  const SuffixArray&);
 
-    void register_suffix_range(size_t begin, size_t end, size_t match_length);
+    void register_suffix_range(size_t begin, size_t end, size_t match_offset, size_t match_length);
     int get_sentence_count() const;
     tsl::hopscotch_map<unsigned, AgendaItem>& get_psentences();
 

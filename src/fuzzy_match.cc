@@ -460,7 +460,7 @@ namespace fuzzy
       std::pair<size_t, size_t> range_suffixid = _suffixArrayIndex->get_SuffixArray().equal_range(pattern_wids.data(), p_length);
 
       if (range_suffixid.first != range_suffixid.second)
-        nGramMatches.register_suffix_range(range_suffixid.first, range_suffixid.second, p_length);
+        nGramMatches.register_suffix_range(range_suffixid.first, range_suffixid.second, 0, p_length);
     }
 
     for (size_t it=0; it < p_length; it++)
@@ -501,9 +501,11 @@ namespace fuzzy
             /* register (n-1) grams */
             nGramMatches.register_suffix_range(previous_range_suffixid.first,
                                                range_suffixid.first,
+                                               it,
                                                subseq_length - 1);
             nGramMatches.register_suffix_range(range_suffixid.second,
                                                previous_range_suffixid.second,
+                                               it,
                                                subseq_length - 1);
           }
 
@@ -518,6 +520,7 @@ namespace fuzzy
       if (subseq_length >= 2)
         nGramMatches.register_suffix_range(previous_range_suffixid.first,
                                            previous_range_suffixid.second,
+                                           it,
                                            subseq_length);
     }
 

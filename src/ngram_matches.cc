@@ -39,7 +39,7 @@ namespace fuzzy
   }
 
   void
-  NGramMatches::register_suffix_range(size_t begin, size_t end, size_t match_length)
+  NGramMatches::register_suffix_range(size_t begin, size_t end, size_t match_offset, size_t match_length)
   {
     // lazy injection feature - if match_length smaller than min_seq_len, we will not process the suffixes for the moment
     if (match_length < min_exact_match || match_length < _min_seq_len)
@@ -57,20 +57,16 @@ namespace fuzzy
       const auto sentence_id = _suffixArray.suffixid2sentenceid()[i].sentence_id;
       auto& agendaItem = _psentences.try_emplace(sentence_id, sentence_id, _p_length).first.value();
 
-      // The match will update the AgendaItem entry only if its length is the longest to date.
-      if (match_length > agendaItem.maxmatch)
+      for (size_t j = match_offset; j < match_offset + match_length; j++)
       {
-        for (size_t j = agendaItem.maxmatch; j < match_length; j++)
+        if (!agendaItem.map_pattern[j])
         {
-          if (!agendaItem.map_pattern[j])
-          {
-            agendaItem.map_pattern[j] = true;
-            agendaItem.coverage++;
-          }
+          agendaItem.map_pattern[j] = true;
+          agendaItem.coverage++;
         }
-
-        agendaItem.maxmatch = match_length;
       }
+
+      agendaItem.maxmatch = std::max(agendaItem.maxmatch, match_length);
     }
   }
 }
